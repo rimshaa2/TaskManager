@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   webapp:
-    container_name: slayed-webapp-jenkins  # unique container name
+    container_name: taskmanager_web  # unique container name
     build: .
     ports:
       - "8081:80"                         # use a different host port (8081 instead of 80)
