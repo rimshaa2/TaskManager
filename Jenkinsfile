@@ -1,26 +1,29 @@
-environment {
-    PROJECT_NAME = 'taskmanager_jenkins'
-    COMPOSE_FILE = 'docker-compose.yml'
-}
+pipeline {
+    agent any
 
-stages {
-    stage('Clone Repository') {
-        steps {
-            git 'https://github.com/rimshaa2/TaskManager.git'
+    environment {
+        PROJECT_NAME = 'taskmanager_jenkins'
+        COMPOSE_FILE = 'docker-compose.yml'
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/rimshaa2/TaskManager.git'
+            }
+        }
+
+        stage('Build and Run with Docker') {
+            steps {
+                sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
+            }
         }
     }
 
-    stage('Build and Run with Docker') {
-        steps {
-            sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down'
         }
     }
 }
-
-post {
-    always {
-        echo 'Cleaning up...'
-        sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down'
-    }
-}
-
