@@ -7,11 +7,12 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repository') {
+       stage('Clone Repository') {
             steps {
-                git 'https://github.com/rimshaa2/TaskManager.git'
+                git branch: 'main', url: 'https://github.com/rimshaa2/TaskManager.git'
             }
         }
+
 
         stage('Build and Run with Docker') {
             steps {
