@@ -1,22 +1,19 @@
 version: '3.8'
 
 services:
-  webapp:
-    container_name: taskmanager_web  # unique container name
-    build: .
-    ports:
-      - "8081:80"                         # use a different host port (8081 instead of 80)
-    volumes:
-      - .:/var/www/html
   web:
+    container_name: taskmanager_web
     build: .
     ports:
-      - "80:80"
+      - "8081:80"  # Expose on 8081
+    volumes:
+      - ./app:/var/www/html  # Avoid mounting the entire context root
     depends_on:
       - db
 
   db:
     image: mysql:5.7
+    container_name: taskmanager_db
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: taskdb
