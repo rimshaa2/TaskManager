@@ -1,19 +1,24 @@
 pipeline {
-    agent {
-        docker {
-            image 'markhobson/maven-chrome'
-        }
+  agent any
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/rimshaa2/TaskManager.git'
+      }
     }
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/rimshaa2/taskmanager.git'
+
+    stage('Run Selenium Tests') {
+      steps {
+        dir('tests') {
+          script {
+            docker.image('markhobson/maven-chrome').inside {
+              sh 'mvn test'
             }
+          }
         }
-        stage('Run Tests') {
-            steps {
-                sh 'python3 test_taskmanager.py'
-            }
-        }
+      }
     }
+  }
 }
+
