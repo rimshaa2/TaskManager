@@ -2,40 +2,29 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER = 'rimshaa2'
-        IMAGE_NAME = 'taskmanager'
+        PROJECT_NAME = 'taskmanager_jenkins'
+        COMPOSE_FILE = 'docker-compose.yml'
     }
 
     stages {
-        stage('Clone Repository') {
+       stage('Clone Repository') {
             steps {
-                git 'https://github.com/rimshaa2/TaskManager'
+                git branch: 'main', url: 'https://github.com/rimshaa2/TaskManager.git'
             }
         }
 
-        stage('Build Docker Image') {
+
+        stage('Build and Run with Docker') {
             steps {
-                sh 'docker build -t $DOCKER_HUB_USER/$IMAGE_NAME .'
+                sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
             }
         }
+    }
 
-        stage('Push to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
-                    sh 'docker push $DOCKER_HUB_USER/$IMAGE_NAME'
-                }
-            }
-        }
-
-        stage('Deploy via Docker Compose') {
-            steps {
-                sh '''
-                    docker-compose down || true
-                    docker-compose pull
-                    docker-compose up -d
-                '''
-            }
+    post {
+        always {
+            echo 'Cleaning up...'
+            //sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down'
         }
     }
 }
