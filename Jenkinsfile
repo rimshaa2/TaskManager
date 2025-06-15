@@ -8,30 +8,29 @@ pipeline {
     }
 
     stages {
-        stage('Clean and Build with Docker') {
+        stage('Clean Up Previous Containers') {
             steps {
-                // Clean up any leftovers
-                sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down || true'
+                // Try to stop and remove old containers (ignore errors)
+                sh '''
+                    docker rm -f taskmanager_db || true
+                    docker rm -f taskmanager_web || true
+                    docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down || true
+                '''
+            }
+        }
 
-                // Rebuild and run containers
+        stage('Build and Run App with Docker') {
+            steps {
                 sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
-
-                // Wait for app & DB to be ready
-                sh 'sleep 10'
+                sh 'sleep 10'  // Wait for DB and web server
             }
         }
 
         stage('Clone and Run Selenium Tests') {
             steps {
-                // Clone the test repo
-                sh 'git clone "$TEST_REPO" tests'
-
-                // Move into the tests directory
+                sh 'git clone $TEST_REPO tests'
                 dir('tests') {
-                    // Build Docker image for tests
                     sh 'docker build -t selenium-tests .'
-
-                    // Run test container with host networking (for Linux-based EC2)
                     sh 'docker run --network="host" selenium-tests'
                 }
             }
@@ -40,10 +39,11 @@ pipeline {
 
     post {
         always {
-            echo 'Cleaning up...'
-            sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down'
+            echo 'Cleaning up containers...'
+            sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down || true'
         }
     }
 }
+
 
 
