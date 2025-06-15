@@ -14,10 +14,16 @@ pipeline {
         }
 
 
-        stage('Build and Run with Docker') {
+       stage('Build and Run with Docker') {
             steps {
-                //sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
+                // Clean up any leftovers
+                sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down || true'
+                
+                // Rebuild and run containers
                 sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
+                
+                // Wait a bit for the DB and web server to start
+                sh 'sleep 10'
             }
         }
     }
