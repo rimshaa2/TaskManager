@@ -19,7 +19,7 @@ services:
       MYSQL_DATABASE: taskdb
     volumes:
       - db_data:/var/lib/mysql
-      - ./app/db-init:/docker-entrypoint-initdb.d
+      - ./db-init:/docker-entrypoint-initdb.d
 
 volumes:
   db_data:
