@@ -4,34 +4,34 @@ pipeline {
     environment {
         PROJECT_NAME = 'taskmanager_jenkins'
         COMPOSE_FILE = 'docker-compose.yml'
-        TEST_REPO = 'https://github.com/yourusername/taskmanager-tests.git'
+        TEST_REPO = 'https://github.com/rimshaa2/taskmanager-tests.git'
     }
 
-    stage('Build and Run with Docker') {
-        steps {
-            // Clean up any leftovers
-            sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down || true'
-            
-            // Rebuild and run containers
-            sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
-            
-            // Wait a bit for the DB and web server to start
-            sh 'sleep 10'
-        }
-    }
-
-        stage('Build and Run App with Docker') {
+    stages {
+        stage('Clean and Build with Docker') {
             steps {
+                // Clean up any leftovers
+                sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE down || true'
+
+                // Rebuild and run containers
                 sh 'docker-compose -p $PROJECT_NAME -f $COMPOSE_FILE up -d --build'
-                sh 'sleep 10'  // wait for app & DB to initialize
+
+                // Wait for app & DB to be ready
+                sh 'sleep 10'
             }
         }
 
         stage('Clone and Run Selenium Tests') {
             steps {
-                sh 'git clone $TEST_REPO tests'
+                // Clone the test repo
+                sh 'git clone "$TEST_REPO" tests'
+
+                // Move into the tests directory
                 dir('tests') {
+                    // Build Docker image for tests
                     sh 'docker build -t selenium-tests .'
+
+                    // Run test container with host networking (for Linux-based EC2)
                     sh 'docker run --network="host" selenium-tests'
                 }
             }
@@ -45,4 +45,5 @@ pipeline {
         }
     }
 }
+
 
