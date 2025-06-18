@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PROJECT_NAME = 'taskmanager_jenkins'
-        COMPOSE_FILE = 'docker-compose.yml'
+        COMPOSE_FILE = 'docker-compose.ci.yml'
     }
 
     stages {
