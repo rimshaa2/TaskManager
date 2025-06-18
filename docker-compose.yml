@@ -4,11 +4,11 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile  
+      dockerfile: Dockerfile
     ports:
-      - "8081:80"                          # changed port to avoid conflict
+      - "80:80"
     volumes:
-      - ./app:/var/www/html               # volume mount to sync code changes
+      - ./app:/var/www/html
     depends_on:
       - db
 
@@ -21,8 +21,7 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     volumes:
-      - db_data_ci:/var/lib/mysql         # changed volume for CI
+      - db_data:/var/lib/mysql
 
 volumes:
-  db_data_ci:
-
+  db_data:
