@@ -4,8 +4,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: taskmanager_ci_web    # changed name
+      dockerfile: Dockerfile  
     ports:
       - "8081:80"                          # changed port to avoid conflict
     volumes:
@@ -15,7 +14,6 @@ services:
 
   db:
     image: mysql:5.7
-    container_name: taskmanager_ci_db     # changed name
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
